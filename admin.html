@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Panel Guru</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@500;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body>
+<header class="adm-top">
+  <h1>Panel Guru</h1>
+  <a class="pn-btn pn-btn--small" href="./">Buka halaman siswa</a>
+</header>
+
+<main class="adm">
+  <p class="adm-intro">Atur sumber data dan upload GIF + suara untuk tiap tier. Tombol <b>Simpan &amp; Publikasikan</b> mengirim file langsung ke repo GitHub kamu. Halaman siswa ter-update sekitar 1 menit kemudian.</p>
+
+  <!-- 1. GitHub -->
+  <section class="adm-sec pn-card">
+    <div class="adm-sec__head"><span class="adm-num">1</span><h2>Koneksi GitHub</h2></div>
+    <p class="pn-hint">Butuh <i>fine-grained personal access token</i> dengan izin <b>Contents: Read and write</b> untuk repo ini saja. Cara membuatnya ada di README.</p>
+    <div class="adm-grid">
+      <label class="adm-field"><span class="pn-label">Pemilik (username)</span><input class="pn-input pn-input--text" id="gh-owner" autocomplete="off" spellcheck="false"></label>
+      <label class="adm-field"><span class="pn-label">Nama repo</span><input class="pn-input pn-input--text" id="gh-repo" autocomplete="off" spellcheck="false"></label>
+      <label class="adm-field"><span class="pn-label">Branch</span><input class="pn-input pn-input--text" id="gh-branch" value="main" autocomplete="off" spellcheck="false"></label>
+      <label class="adm-field adm-field--wide"><span class="pn-label">Token</span><input class="pn-input pn-input--text" id="gh-token" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_…"></label>
+    </div>
+    <label class="adm-check"><input type="checkbox" id="gh-remember"> Ingat token di browser ini (jangan dicentang di komputer umum)</label>
+    <div class="adm-row">
+      <button class="pn-btn pn-btn--primary" id="gh-connect" type="button">Hubungkan</button>
+      <button class="pn-btn" id="gh-forget" type="button">Lupakan token</button>
+      <p class="pn-hint" id="gh-status" role="status">Belum terhubung.</p>
+    </div>
+  </section>
+
+  <!-- 2. Sheet -->
+  <section class="adm-sec pn-card">
+    <div class="adm-sec__head"><span class="adm-num">2</span><h2>Data Google Sheets</h2></div>
+    <p class="pn-hint">Di Google Sheets: <b>File › Bagikan › Publikasikan ke web</b>, pilih sheet nilai, format <b>CSV</b>, lalu tempel link-nya di sini. Kosongkan untuk mode demo.</p>
+    <label class="adm-field"><span class="pn-label">Link CSV</span><input class="pn-input pn-input--text" id="sheet-url" placeholder="https://docs.google.com/spreadsheets/d/e/…/pub?output=csv" spellcheck="false"></label>
+    <label class="adm-field"><span class="pn-label">Nama mapel (opsional)</span><input class="pn-input pn-input--text" id="subject-names" placeholder="Matematika, IPA"></label>
+    <p class="pn-hint">Isi hanya jika sheet tidak punya kolom <code>Mapel</code>. Urutan nama mengikuti urutan baris tiap siswa.</p>
+    <div class="adm-row">
+      <button class="pn-btn" id="sheet-test" type="button">Tes data</button>
+      <p class="pn-hint" id="sheet-status" role="status"></p>
+    </div>
+  </section>
+
+  <!-- 3. Media -->
+  <section class="adm-sec pn-card">
+    <div class="adm-sec__head"><span class="adm-num">3</span><h2>GIF &amp; suara per tier</h2></div>
+    <p class="pn-hint">GIF: gif, webp, png, jpg. Suara: mp3, wav, ogg, m4a. Maksimal 20 MB per file. Tier tanpa suara memakai nada bawaan.</p>
+    <div class="tiers" id="tiers"></div>
+  </section>
+
+  <div class="adm-save">
+    <button class="pn-btn pn-btn--primary pn-btn--big" id="save-btn" type="button">Simpan &amp; Publikasikan</button>
+    <p class="pn-hint" id="save-status" role="status">Hubungkan GitHub dulu untuk menyimpan.</p>
+    <ol class="adm-log" id="save-log"></ol>
+  </div>
+
+  <!-- 4. QR code -->
+  <section class="adm-sec pn-card" id="qr-section">
+    <div class="adm-sec__head"><span class="adm-num">4</span><h2>QR code untuk siswa</h2></div>
+    <p class="pn-hint">Cetak dan tempel QR ini. Siswa cukup scan untuk membuka halaman nilai. Gambar tengah tidak di-upload ke mana pun; semuanya dibuat di browser ini.</p>
+    <div class="qr-layout">
+      <div class="qr-form">
+        <label class="adm-field"><span class="pn-label">Link halaman siswa</span><input class="pn-input pn-input--text" id="qr-url" spellcheck="false"></label>
+        <label class="adm-field"><span class="pn-label">Teks di bawah QR (opsional)</span><input class="pn-input pn-input--text" id="qr-caption" value="Scan untuk lihat nilaimu!" maxlength="40"></label>
+        <fieldset class="adm-field qr-choice">
+          <legend class="pn-label">Gambar di tengah</legend>
+          <label class="adm-check"><input type="radio" name="qr-logo" value="default" checked> Logo A+ bawaan</label>
+          <label class="adm-check"><input type="radio" name="qr-logo" value="custom"> Gambar sendiri</label>
+          <label class="adm-check"><input type="radio" name="qr-logo" value="none"> Tanpa gambar</label>
+          <label class="pn-btn pn-btn--small qr-upload" id="qr-upload-label" hidden>Pilih gambar<input type="file" class="sr-only" id="qr-logo-file" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"></label>
+        </fieldset>
+        <label class="adm-field qr-color"><span class="pn-label">Warna QR</span><input type="color" id="qr-color" value="#22193a"></label>
+        <p class="pn-hint" id="qr-status" role="status"></p>
+        <div class="adm-row">
+          <button class="pn-btn pn-btn--primary" id="qr-download" type="button">Unduh PNG</button>
+          <button class="pn-btn" id="qr-print" type="button">Cetak</button>
+        </div>
+      </div>
+      <div class="qr-preview"><canvas id="qr-canvas" aria-label="Pratinjau QR code"></canvas></div>
+    </div>
+  </section>
+</main>
+
+<div class="print-area" id="print-area"><img id="print-img" alt="QR code halaman nilai"></div>
+
+<template id="tier-tpl">
+  <article class="tier">
+    <div class="tier__head">
+      <span class="pn-badge tier__badge"></span>
+      <span class="tier__range"></span>
+    </div>
+    <div class="tier__slots">
+      <div class="slot">
+        <span class="pn-label">GIF</span>
+        <div class="slot__preview slot__preview--img"><img alt=""><span class="slot__empty">Belum ada GIF</span></div>
+        <div class="slot__actions">
+          <label class="pn-btn pn-btn--small">Pilih file<input type="file" class="sr-only" data-kind="gif" accept="image/gif,image/webp,image/png,image/jpeg"></label>
+          <button class="pn-btn pn-btn--small" type="button" data-clear="gif">Kosongkan</button>
+        </div>
+        <span class="slot__state pn-hint"></span>
+      </div>
+      <div class="slot">
+        <span class="pn-label">Suara</span>
+        <div class="slot__preview slot__preview--audio"><audio controls preload="none"></audio><span class="slot__empty">Nada bawaan</span></div>
+        <div class="slot__actions">
+          <label class="pn-btn pn-btn--small">Pilih file<input type="file" class="sr-only" data-kind="sound" accept="audio/mpeg,audio/wav,audio/x-wav,audio/ogg,audio/mp4,audio/x-m4a,.mp3,.wav,.ogg,.m4a"></label>
+          <button class="pn-btn pn-btn--small" type="button" data-clear="sound">Kosongkan</button>
+        </div>
+        <span class="slot__state pn-hint"></span>
+      </div>
+    </div>
+  </article>
+</template>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="assets/js/common.js"></script>
+<script src="assets/js/admin.js"></script>
+<script src="assets/js/qr.js"></script>
+</body>
+</html>

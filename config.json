@@ -1,0 +1,27 @@
+{
+  "sheetCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vR1qsiYWll5SkiU2jqjetHx0GHYUYNuaZIM9KT3Z1FGPB-DWFDyhj_mjwOXqV7hxB2EpY0osSv3J-Cz/pub?gid=0&single=true&output=csv",
+  "subjectNames": [],
+  "media": {
+    "excellent": {
+      "gif": "",
+      "sound": ""
+    },
+    "awesome": {
+      "gif": "",
+      "sound": ""
+    },
+    "great": {
+      "gif": "",
+      "sound": ""
+    },
+    "good": {
+      "gif": "",
+      "sound": ""
+    },
+    "keepgoing": {
+      "gif": "",
+      "sound": ""
+    }
+  },
+  "version": ""
+}
