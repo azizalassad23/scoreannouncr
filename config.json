@@ -1,27 +1,30 @@
 {
   "sheetCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vR1qsiYWll5SkiU2jqjetHx0GHYUYNuaZIM9KT3Z1FGPB-DWFDyhj_mjwOXqV7hxB2EpY0osSv3J-Cz/pub?gid=0&single=true&output=csv",
-  "subjectNames": [],
+  "subjectNames": [
+    "INFORMATIKA",
+    "KKA"
+  ],
   "media": {
     "excellent": {
-      "gif": "",
-      "sound": ""
+      "gif": "media/excellent.gif",
+      "sound": "media/excellent-sound.mp3"
     },
     "awesome": {
-      "gif": "",
-      "sound": ""
+      "gif": "media/awesome.gif",
+      "sound": "media/awesome-sound.mp3"
     },
     "great": {
-      "gif": "",
-      "sound": ""
+      "gif": "media/great.gif",
+      "sound": "media/great-sound.mp3"
     },
     "good": {
-      "gif": "",
-      "sound": ""
+      "gif": "media/good.gif",
+      "sound": "media/good-sound.mp3"
     },
     "keepgoing": {
-      "gif": "",
-      "sound": ""
+      "gif": "media/keepgoing.gif",
+      "sound": "media/keepgoing-sound.mp3"
     }
   },
-  "version": ""
+  "version": "1790912467950"
 }
