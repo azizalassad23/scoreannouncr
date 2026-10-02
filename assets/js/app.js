@@ -15,7 +15,7 @@
     frontSubject: $('front-subject'), backSubject: $('back-subject'),
     orb: $('score-orb'), num: $('score-num'), badge: $('tier-badge'), msg: $('tier-msg'),
     media: $('media'), mediaImg: $('media-img'),
-    nextBtn: $('next-btn'), summaryBtn: $('summary-btn'),
+    nextBtn: $('next-btn'), summaryBtn: $('summary-btn'), doneBtn: $('done-btn'), doneReplayBtn: $('done-replay-btn'),
     summaryName: $('summary-name'), summaryMeta: $('summary-meta'), summaryList: $('summary-list'),
     replayBtn: $('replay-btn'), againBtn: $('again-btn'),
     sound: $('sound-toggle'), confetti: $('confetti')
@@ -26,7 +26,7 @@
   announcer.setAttribute('aria-live', 'polite');
   document.body.appendChild(announcer);
 
-  var state = { config: null, students: [], student: null, results: [], step: 0, busy: false, audio: {}, playing: null };
+  var state = { config: null, students: [], student: null, results: [], step: 0, busy: false, audio: {}, playing: null, format: null, readyHint: '' };
 
   /* ---------- Sound on/off ---------- */
   var muted = false;
@@ -200,10 +200,12 @@
     return PN.loadStudents(cfg);
   }).then(function (res) {
     state.students = res.students;
+    state.format = PN.nisFormat(res.students);
     el.demo.hidden = !res.demo;
     el.lookupBtn.disabled = false;
     el.lookupBtn.textContent = 'Lihat Nilai';
-    setHint('Data siap. Semoga hasilnya bikin senyum!');
+    applyNisFormat();
+    setHint(state.readyHint);
   }).catch(function (err) {
     el.lookupBtn.disabled = false;
     el.lookupBtn.textContent = 'Coba muat ulang';
@@ -211,15 +213,49 @@
     setHint((err && err.message) || 'Data nilai gagal dimuat.', true);
   });
 
+  // Example number in the real format that belongs to no student, e.g. "20261234".
+  function exampleNis(f) {
+    var fill = '1234567890123456789';
+    for (var shift = 0; shift < 10; shift++) {
+      var body = '';
+      for (var i = f.prefix.length; i < f.length; i++) body += fill[(i - f.prefix.length + shift) % 10];
+      var ex = f.prefix + body;
+      if (!PN.findStudent(state.students, ex)) return ex;
+    }
+    return f.prefix + new Array(f.length - f.prefix.length + 1).join('x');
+  }
+
+  function applyNisFormat() {
+    var f = state.format;
+    if (!f) {
+      el.input.placeholder = 'Ketik NIS kamu';
+      state.readyHint = 'Ketik NIS kamu persis seperti di kartu pelajar.';
+      return;
+    }
+    el.input.placeholder = 'contoh: ' + exampleNis(f);
+    el.input.maxLength = f.length + 4;
+    state.readyHint = 'NIS kamu terdiri dari ' + f.length + (f.digits ? ' angka' : ' karakter') + ', persis seperti di kartu pelajar.';
+  }
+
+  function checkFormat(nis) {
+    var f = state.format;
+    if (!f) return '';
+    if (f.digits && !/^\d+$/.test(nis)) return 'NIS hanya berisi angka, tanpa huruf atau tanda baca.';
+    if (nis.length < f.length) return 'NIS harus ' + f.length + ' angka. Yang kamu ketik baru ' + nis.length + ' angka.';
+    if (nis.length > f.length) return 'NIS harus ' + f.length + ' angka. Yang kamu ketik ' + nis.length + ' angka, kelebihan ' + (nis.length - f.length) + '.';
+    return '';
+  }
+
   /* ---------- Lookup ---------- */
   el.form.addEventListener('submit', function (e) {
     e.preventDefault();
     if (el.lookupBtn.dataset.reload) { location.reload(); return; }
-    var nis = el.input.value.trim();
+    var nis = el.input.value.replace(/\s+/g, '');
     el.form.classList.remove('is-error');
     if (!nis) { fail('Ketik NIS kamu dulu, ya.'); return; }
+    // Format hints only when the NIS is not found, so an unusual but real NIS still works.
     var st = PN.findStudent(state.students, nis);
-    if (!st) { fail('NIS ' + nis + ' belum ketemu. Cek lagi angkanya, ya.'); return; }
+    if (!st) { fail(checkFormat(nis) || 'NIS ' + nis + ' belum ketemu. Cek lagi angkanya, ya.'); return; }
 
     state.student = st;
     state.results = st.subjects.map(function (s) {
@@ -241,7 +277,8 @@
   function startReveal() {
     var n = state.results.length;
     el.greetName.textContent = firstName(state.student.name) + '!';
-    el.greetSub.textContent = n > 1 ? 'Ada ' + n + ' nilai yang menunggu dibuka. Siap?' : 'Nilaimu sudah menunggu. Siap?';
+    el.greetSub.textContent = n > 1 ? 'Ada ' + n + ' nilai yang menunggu dibuka. Siap?' : 'Nilai ' + state.results[0].subject + ' kamu sudah menunggu. Siap?';
+    el.steps.hidden = n < 2;
     el.steps.innerHTML = '';
     state.results.forEach(function (r) {
       var li = document.createElement('li');
@@ -279,6 +316,8 @@
     el.mediaImg.removeAttribute('src');
     el.nextBtn.hidden = true;
     el.summaryBtn.hidden = true;
+    el.doneBtn.hidden = true;
+    el.doneReplayBtn.hidden = true;
     el.front.focus({ preventScroll: true });
   }
 
@@ -329,8 +368,11 @@
     announcer.textContent = r.subject + ': ' + fmt(r.score) + ', ' + r.tier.label + '. ' + r.message;
 
     var last = state.step === state.results.length - 1;
+    var single = state.results.length === 1;
     el.nextBtn.hidden = last;
-    el.summaryBtn.hidden = !last;
+    el.summaryBtn.hidden = !last || single;
+    el.doneBtn.hidden = !single;
+    el.doneReplayBtn.hidden = !single;
     state.busy = false;
   }
 
@@ -371,13 +413,16 @@
     renderStep(0);
   });
 
+  el.doneReplayBtn.addEventListener('click', function () { renderStep(0); });
+  el.doneBtn.addEventListener('click', function () { el.againBtn.click(); });
+
   el.againBtn.addEventListener('click', function () {
     stopSound();
     state.student = null;
     state.results = [];
     el.input.value = '';
     el.form.classList.remove('is-error');
-    setHint('Data siap. Semoga hasilnya bikin senyum!');
+    setHint(state.readyHint);
     show(el.lookup);
     el.input.focus({ preventScroll: true });
   });

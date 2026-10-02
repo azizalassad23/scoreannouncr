@@ -3,7 +3,7 @@
 Halaman pengumuman nilai siswa. Siswa mengetik NIS, membuka kartu misteri, lalu melihat nilainya. Setiap nilai tampil bersama GIF, suara, dan confetti sesuai tiernya. Data nilai diambil dari Google Sheets. Halaman di-host di GitHub Pages.
 
 - `index.html`: halaman siswa
-- `admin.html`: panel guru untuk mengatur link sheet dan meng-upload GIF/suara
+- `minad.html`: panel guru untuk mengatur link sheet dan meng-upload GIF/suara
 
 ## Tier
 
@@ -77,7 +77,7 @@ Token hanya disimpan di browser Anda, dan hanya jika "Ingat token" dicentang. Ja
 
 ## 4. Pakai panel guru
 
-Buka `https://<username>.github.io/pengumuman-nilai/admin.html`.
+Buka `https://<username>.github.io/scoreannouncr/minad.html`.
 
 1. **Koneksi GitHub:** isi token, lalu klik **Hubungkan**. Pemilik dan nama repo terisi otomatis.
 2. **Data Google Sheets:** tempel link CSV, lalu klik **Tes data** untuk memastikan sheet terbaca.
@@ -90,7 +90,7 @@ Cara manual tanpa panel guru: upload file ke folder `media/` di repo, lalu edit 
 
 ## 5. QR code untuk siswa
 
-Di bagian bawah `admin.html`, bagian **QR code untuk siswa** membuat QR yang mengarah ke halaman siswa.
+Di bagian bawah `minad.html`, bagian **QR code untuk siswa** membuat QR yang mengarah ke halaman siswa.
 
 - Link terisi otomatis dengan alamat GitHub Pages.
 - Gambar tengah bisa memakai logo A+ bawaan, gambar sendiri, atau tanpa gambar. QR memakai koreksi error level H, jadi tetap terbaca walaupun bagian tengahnya tertutup gambar.

@@ -16,13 +16,13 @@
 
   function defaultUrl() {
     if (/\.github\.io$/i.test(location.hostname)) {
-      return location.origin + location.pathname.replace(/admin\.html$/i, '');
+      return location.origin + location.pathname.replace(/minad\.html$/i, '');
     }
     var owner = $('gh-owner').value.trim(), repo = $('gh-repo').value.trim();
     if (owner && repo) {
       return /\.github\.io$/i.test(repo) ? 'https://' + repo + '/' : 'https://' + owner.toLowerCase() + '.github.io/' + repo + '/';
     }
-    return location.href.replace(/admin\.html.*$/i, '');
+    return location.href.replace(/minad\.html.*$/i, '');
   }
 
   function luminance(hex) {

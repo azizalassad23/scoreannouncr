@@ -1,4 +1,4 @@
-/* Shared by index.html and admin.html: tiers, config, CSV parsing. */
+/* Shared by index.html and minad.html: tiers, config, CSV parsing. */
 (function () {
   'use strict';
 
@@ -186,7 +186,9 @@
         var n = st.subjects.length;
         var subj = layout === 'long-subject' ? (r[subjectCol] || '').trim() : '';
         if (!subj) subj = (config.subjectNames && config.subjectNames[n]) || ('Mapel ' + (n + 1));
-        st.subjects.push({ name: subj, score: sc });
+        var dup = layout === 'long-subject' && st.subjects.filter(function (x) { return x.name.toLowerCase() === subj.toLowerCase(); })[0];
+        if (dup) dup.score = sc; // same subject twice: the later row wins
+        else st.subjects.push({ name: subj, score: sc });
       }
     });
 
@@ -214,7 +216,24 @@
       });
   }
 
+  // Dominant NIS length and shared leading digits, used for the input hint.
+  function nisFormat(students) {
+    var lens = {}, total = students.length;
+    if (!total) return null;
+    students.forEach(function (s) { var n = normNis(s.nis); lens[n.length] = (lens[n.length] || 0) + 1; });
+    var len = Number(Object.keys(lens).sort(function (a, b) { return lens[b] - lens[a]; })[0]);
+    if (lens[len] / total < 0.8) return null;
+    var same = students.map(function (s) { return normNis(s.nis); }).filter(function (n) { return n.length === len; });
+    // Most common leading digits, only to make the example look like a real NIS.
+    var counts = {}, p = Math.min(4, len - 2);
+    same.forEach(function (n) { var k = n.slice(0, p); counts[k] = (counts[k] || 0) + 1; });
+    var prefix = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; })[0] || '';
+    var digits = /^\d+$/.test(same[0] || '');
+    return { length: len, prefix: prefix, digits: digits };
+  }
+
   window.PN = {
+    nisFormat: nisFormat,
     TIERS: TIERS,
     tierFor: tierFor,
     pick: pick,

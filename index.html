@@ -30,7 +30,7 @@
   </button>
 </header>
 
-<p class="demo-banner" id="demo-banner" hidden>Mode demo: data contoh dari <code>sample.csv</code>. Coba NIS 1001 sampai 1005.</p>
+<p class="demo-banner" id="demo-banner" hidden>Mode demo: data contoh dari <code>sample.csv</code>.</p>
 
 <main>
   <!-- Screen 1: lookup -->
@@ -41,7 +41,7 @@
     <form class="lookup pn-card" id="lookup-form" novalidate>
       <label class="lookup__field">
         <span class="pn-label">NIS kamu</span>
-        <input class="pn-input" id="nis-input" name="nis" inputmode="numeric" autocomplete="off" placeholder="contoh: 1001" required>
+        <input class="pn-input" id="nis-input" name="nis" inputmode="numeric" autocomplete="off" placeholder="Memuat…" required>
       </label>
       <button class="pn-btn pn-btn--primary pn-btn--big" id="lookup-btn" type="submit" disabled>Memuat data…</button>
       <p class="pn-hint" id="lookup-hint" role="status" aria-live="polite">Sedang mengambil data nilai…</p>
@@ -78,6 +78,8 @@
     <div class="actions">
       <button class="pn-btn pn-btn--primary pn-btn--big" id="next-btn" type="button" hidden>Buka mapel berikutnya</button>
       <button class="pn-btn pn-btn--primary pn-btn--big" id="summary-btn" type="button" hidden>Lihat rekap</button>
+      <button class="pn-btn" id="done-replay-btn" type="button" hidden>Putar ulang</button>
+      <button class="pn-btn pn-btn--primary" id="done-btn" type="button" hidden>Cek NIS lain</button>
     </div>
   </section>
 
